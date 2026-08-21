@@ -64,19 +64,6 @@ sidebar and click **Analyze**.
 python stock_analyzer_v01.py
 ```
 
-### Enabling the AI Synthesizer
-
-- **In the app:** check "Enable AI Synthesizer Agent" in the sidebar and
-  paste your API key directly there (used only for that session, never saved)
-- **In the terminal script:** paste your key into the `ANTHROPIC_API_KEY`
-  constant near the top of `stock_analyzer_v01.py`
-
-Get a free key at [console.anthropic.com](https://console.anthropic.com).
-**Never commit a real API key to this repo** — the terminal script's key
-placeholder should stay as-is before pushing.
-
----
-
 ## Known limitations
 
 - `yfinance` coverage for NSE stocks is inconsistent, especially for
