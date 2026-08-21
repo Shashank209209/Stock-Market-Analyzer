@@ -99,7 +99,7 @@ placeholder should stay as-is before pushing.
 
 ## Tech stack
 
-Python, Pandas, `yfinance`, Streamlit, Plotly, Anthropic API (optional)
+Python, Pandas, `yfinance`, Streamlit, Plotly
 
 ---
 
