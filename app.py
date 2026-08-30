@@ -284,11 +284,14 @@ if analyze_clicked:
             data = cached_fetch_data(ticker, period)
 
         if data.empty:
-            st.error(
-                f"No data found for '{ticker}'. Double-check the exact NSE symbol "
-                f"(e.g. RELIANCE, TCS, INFY, RPOWER) and try again."
-            )
-            st.stop()
+    st.error(
+        f"⚠️ Yahoo Finance did not return data for {ticker}."
+    )
+    st.info(
+        "Yahoo Finance may be temporarily rate-limiting this app. "
+        "Please wait a few minutes and try again."
+    )
+    st.stop()
 
         data = add_indicators(data)
         technical_summary = summarize_latest(data, ticker)
