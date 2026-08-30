@@ -66,20 +66,43 @@ PERIOD = "1y"   # how much history to pull: "6mo", "1y", "2y", etc.
 # ----------------------------------------------------------------------
 def fetch_data(ticker: str, period: str) -> pd.DataFrame:
     """
-    Returns a DataFrame with columns: Open, High, Low, Close, Volume
-    Indexed by Date. This is the raw material everything else is built from.
+    Fetch stock data from Yahoo Finance with retries.
+    Handles temporary empty responses from Yahoo Finance.
     """
-    df = _fetch_with_retry(lambda: yf.download(ticker, period=period, progress=False))
 
-    # Newer yfinance versions return MultiIndex columns even for a single
-    # ticker, e.g. ('Close', 'TCS.NS') instead of just 'Close'. That breaks
-    # simple column access later (df['Close'] stops being a plain Series),
-    # so we flatten it back down to single-level column names here.
-    if isinstance(df.columns, pd.MultiIndex):
-        df.columns = df.columns.get_level_values(0)
+    last_df = pd.DataFrame()
 
-    df.dropna(inplace=True)  # drop any rows with missing data
-    return df
+    for attempt in range(3):
+        try:
+            df = yf.download(
+                ticker,
+                period=period,
+                progress=False,
+                auto_adjust=False
+            )
+
+            if df is not None and not df.empty:
+                # Handle newer yfinance MultiIndex format
+                if isinstance(df.columns, pd.MultiIndex):
+                    df.columns = df.columns.get_level_values(0)
+
+                df.dropna(inplace=True)
+
+                if not df.empty:
+                    return df
+
+            last_df = df if df is not None else pd.DataFrame()
+
+            # Yahoo returned nothing — wait before trying again
+            time.sleep(2 ** attempt)
+
+        except Exception as e:
+            if attempt == 2:
+                raise
+
+            time.sleep(2 ** attempt)
+
+    return last_df
 
 
 def validate_data(df: pd.DataFrame, ticker: str) -> None:
